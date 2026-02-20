@@ -74,10 +74,9 @@
             background: rgba(255,255,255,0.1);
             color: white;
             font-size: 20px;
-            font-family: monospace;
-            letter-spacing: 0.25em;
+            font-family: Arial, sans-serif;
+            letter-spacing: 0.1em;
             text-align: center;
-            text-transform: uppercase;
         }
         .config-panel input::placeholder { color: rgba(255,255,255,0.3); font-size: 14px; letter-spacing: 0.05em; }
         .url-preview {
@@ -130,7 +129,7 @@
     <!-- Google Apps Script URL Config -->
     <div class="config-panel">
         <label>🔑 Codi d'accés (4 caràcters)</label>
-        <input type="text" id="script-url" placeholder="_ _ _ _" maxlength="4" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
+        <input type="text" id="script-url" placeholder="_ _ _ _" maxlength="4" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" />
         <div class="url-preview" id="url-preview"></div>
         <button class="btn-test" onclick="testConnection()">🔌 Provar connexió</button>
     </div>
@@ -205,7 +204,7 @@
 
         urlInput.addEventListener('input', () => {
             // Allow only alphanumeric chars, auto-uppercase
-            urlInput.value = urlInput.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            urlInput.value = urlInput.value.replace(/[^a-zA-Z0-9]/g, '');
             localStorage.setItem('scriptSuffix', urlInput.value);
             updatePreview();
         });
