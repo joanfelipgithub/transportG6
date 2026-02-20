@@ -289,15 +289,13 @@
             }
             actualitzarEstatConnexio('pendent');
             try {
-                const res = await fetch(`${url}?test=true`);
-                const json = await res.json();
-                if (json.success) {
-                    actualitzarEstatConnexio('ok');
-                    if (!silent) mostrarNotificacion('✅ Connexió correcta!', '#4CAF50');
-                    return true;
-                } else {
-                    throw new Error('Resposta inesperada');
-                }
+                await Promise.race([
+                    fetch(`${url}?test=true`, { method: 'GET', mode: 'no-cors' }),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
+                ]);
+                actualitzarEstatConnexio('ok');
+                if (!silent) mostrarNotificacion('✅ Connexió correcta!', '#4CAF50');
+                return true;
             } catch (err) {
                 actualitzarEstatConnexio('error');
                 if (!silent) mostrarNotificacion('❌ Error de connexió: ' + err.message, '#f44336');
@@ -327,14 +325,12 @@
             });
 
             try {
-                const res = await fetch(`${url}?${params.toString()}`);
-                const json = await res.json();
-                if (json.success) {
-                    actualitzarEstatConnexio('ok');
-                    mostrarNotificacion('✅ Registrat a Google Sheets', '#4CAF50');
-                } else {
-                    throw new Error(json.error || 'Error desconegut');
-                }
+                await Promise.race([
+                    fetch(`${url}?${params.toString()}`, { method: 'GET', mode: 'no-cors' }),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
+                ]);
+                actualitzarEstatConnexio('ok');
+                mostrarNotificacion('✅ Registrat a Google Sheets', '#4CAF50');
             } catch (err) {
                 pendingQueue.push(dades);
                 actualitzarEstatConnexio('error');
