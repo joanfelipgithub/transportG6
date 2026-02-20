@@ -289,10 +289,15 @@
             }
             actualitzarEstatConnexio('pendent');
             try {
-                await fetch(`${url}?test=true`, { method: 'GET', mode: 'no-cors' });
-                actualitzarEstatConnexio('ok');
-                if (!silent) mostrarNotificacion('✅ Connexió correcta!', '#4CAF50');
-                return true;
+                const res = await fetch(`${url}?test=true`);
+                const json = await res.json();
+                if (json.success) {
+                    actualitzarEstatConnexio('ok');
+                    if (!silent) mostrarNotificacion('✅ Connexió correcta!', '#4CAF50');
+                    return true;
+                } else {
+                    throw new Error('Resposta inesperada');
+                }
             } catch (err) {
                 actualitzarEstatConnexio('error');
                 if (!silent) mostrarNotificacion('❌ Error de connexió: ' + err.message, '#f44336');
@@ -322,18 +327,18 @@
             });
 
             try {
-                // mode: 'no-cors' → opaque response, but the GET reaches Apps Script
-                await fetch(`${url}?${params.toString()}`, {
-                    method: 'GET',
-                    mode: 'no-cors'
-                });
-                // Optimistic success (can't read body with no-cors)
-                actualitzarEstatConnexio('ok');
-                mostrarNotificacion('✅ Registrat a Google Sheets', '#4CAF50');
+                const res = await fetch(`${url}?${params.toString()}`);
+                const json = await res.json();
+                if (json.success) {
+                    actualitzarEstatConnexio('ok');
+                    mostrarNotificacion('✅ Registrat a Google Sheets', '#4CAF50');
+                } else {
+                    throw new Error(json.error || 'Error desconegut');
+                }
             } catch (err) {
                 pendingQueue.push(dades);
                 actualitzarEstatConnexio('error');
-                mostrarNotificacion('❌ Error xarxa. En cua per reintentar.', '#f44336');
+                mostrarNotificacion('❌ Error: ' + err.message, '#f44336');
             }
         }
 
