@@ -313,21 +313,24 @@
                 mostrarNotificacion('⚠️ Codi no configurat. Registre en cua.', '#ff9800');
                 return;
             }
-
+        
             actualitzarEstatConnexio('pendent');
-
+        
             const params = new URLSearchParams({
                 id:          dades.id,
                 fecha:       dades.fecha,
                 hora:        dades.hora,
                 responsable: dades.responsable
             });
-
+        
             try {
-                await Promise.race([
-                    fetch(`${url}?${params.toString()}`, { method: 'GET', mode: 'no-cors' }),
+                const res = await Promise.race([
+                    fetch(`${url}?${params.toString()}`),
                     new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
                 ]);
+                // Apps Script returns plain text "Success" or an error string
+                const text = await res.text();
+                if (!text.includes('Success')) throw new Error(text);
                 actualitzarEstatConnexio('ok');
                 mostrarNotificacion('✅ Registrat a Google Sheets', '#4CAF50');
             } catch (err) {
